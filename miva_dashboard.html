@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miva Convocation 2026 — Response Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg: #080b10;
+  --surface: #0f1318;
+  --card: #141920;
+  --card2: #1a2030;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --green: #00e5a0;
+  --blue: #3d8ef0;
+  --orange: #f08c3d;
+  --red: #f05a5a;
+  --purple: #9b7ff0;
+  --text: #eef0f5;
+  --muted: #6b7a8f;
+  --muted2: #4a5568;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ── LOADING SCREEN ── */
+#loading-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 1000; transition: opacity 0.5s ease;
+}
+#loading-screen.hidden { opacity: 0; pointer-events: none; }
+.loader-logo { font-size: 13px; font-family: var(--mono); color: var(--green); letter-spacing: 0.2em; margin-bottom: 32px; text-transform: uppercase; }
+.loader-bar-wrap { width: 240px; height: 2px; background: var(--card2); border-radius: 2px; overflow: hidden; margin-bottom: 16px; }
+.loader-bar { height: 100%; background: var(--green); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
+.loader-status { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+/* ── ERROR SCREEN ── */
+#error-screen {
+  display: none; position: fixed; inset: 0; background: var(--bg);
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 999;
+}
+#error-screen.show { display: flex; }
+.error-box { background: var(--card); border: 1px solid rgba(240,90,90,0.3); border-radius: 12px; padding: 32px 40px; max-width: 500px; text-align: center; }
+.error-box h2 { color: var(--red); font-size: 18px; margin-bottom: 12px; }
+.error-box p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.error-box code { display: block; margin-top: 16px; padding: 12px; background: var(--bg); border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--orange); word-break: break-all; }
+.error-btn { margin-top: 20px; padding: 10px 24px; background: var(--red); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: var(--sans); font-size: 14px; font-weight: 600; }
+
+/* ── LAYOUT ── */
+#app { display: none; }
+#app.ready { display: block; }
+
+header {
+  padding: 28px 40px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  position: sticky; top: 0; background: rgba(8,11,16,0.92);
+  backdrop-filter: blur(12px); z-index: 100;
+}
+.header-left {}
+.header-eyebrow { font-family: var(--mono); font-size: 10px; color: var(--green); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+.header-title { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
+.header-title span { color: var(--green); }
+.header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.data-badge { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; }
+.data-badge strong { color: var(--green); }
+.header-btn {
+  padding: 8px 16px; border-radius: 8px; font-family: var(--mono); font-size: 11px;
+  font-weight: 500; cursor: pointer; border: 1px solid; letter-spacing: 0.05em;
+  text-transform: uppercase; transition: all 0.2s; text-decoration: none; display: inline-block;
+}
+.btn-refresh { background: transparent; border-color: var(--blue); color: var(--blue); }
+.btn-refresh:hover { background: rgba(61,142,240,0.1); }
+.btn-gh { background: transparent; border-color: var(--border2); color: var(--muted); }
+.btn-gh:hover { border-color: var(--text); color: var(--text); }
+
+main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
+
+/* ── QUERY BOX ── */
+.query-section {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(0,229,160,0.06), rgba(61,142,240,0.04));
+  border: 1px solid rgba(0,229,160,0.2);
+  border-radius: 16px; padding: 24px;
+}
+.query-label { font-family: var(--mono); font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.query-label::after { content: ''; flex: 1; height: 1px; background: rgba(0,229,160,0.2); }
+.query-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pill {
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-family: var(--mono);
+  color: var(--muted); background: var(--card); border: 1px solid var(--border2);
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.pill:hover { color: var(--green); border-color: rgba(0,229,160,0.4); background: rgba(0,229,160,0.05); }
+.query-input-row { display: flex; gap: 10px; }
+#q-input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 10px; color: var(--text); font-family: var(--sans); font-size: 14px;
+  padding: 11px 16px; outline: none; transition: border-color 0.2s;
+}
+#q-input:focus { border-color: var(--green); }
+#q-input::placeholder { color: var(--muted2); }
+.query-btn {
+  padding: 11px 22px; background: var(--green); color: #000; border: none;
+  border-radius: 10px; font-family: var(--mono); font-size: 12px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: opacity 0.2s; letter-spacing: 0.05em;
+}
+.query-btn:hover { opacity: 0.85; }
+#q-result {
+  margin-top: 16px; font-family: var(--mono); font-size: 13px; line-height: 1.9;
+  color: var(--text); white-space: pre-wrap; display: none;
+  background: var(--bg); border-radius: 10px; padding: 16px; border: 1px solid var(--border);
+}
+
+/* ── FILTERS ── */
+.filters-row {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  margin-bottom: 28px; padding: 16px 20px;
+  background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+}
+.filter-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+.filter-select {
+  background: var(--card); border: 1px solid var(--border2); border-radius: 8px;
+  color: var(--text); font-family: var(--sans); font-size: 13px; padding: 7px 12px;
+  outline: none; cursor: pointer; transition: border-color 0.2s;
+}
+.filter-select:focus { border-color: var(--blue); }
+.filter-group { display: flex; align-items: center; gap: 8px; }
+.filter-count { font-family: var(--mono); font-size: 11px; color: var(--green); margin-left: auto; }
+.reset-btn {
+  padding: 7px 14px; background: transparent; border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--muted); font-family: var(--mono); font-size: 11px;
+  cursor: pointer; transition: all 0.2s;
+}
+.reset-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ── METRICS ── */
+.metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
+.metric {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px 22px; position: relative; overflow: hidden;
+}
+.metric::before { content: ''; position: absolute; inset: 0; opacity: 0.04; }
+.metric.g::before { background: var(--green); }
+.metric.b::before { background: var(--blue); }
+.metric.o::before { background: var(--orange); }
+.metric.r::before { background: var(--red); }
+.metric.p::before { background: var(--purple); }
+.metric-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.metric-value { font-size: 36px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.metric.g .metric-value { color: var(--green); }
+.metric.b .metric-value { color: var(--blue); }
+.metric.o .metric-value { color: var(--orange); }
+.metric.r .metric-value { color: var(--red); }
+.metric.p .metric-value { color: var(--purple); }
+.metric-sub { font-size: 12px; color: var(--muted); margin-top: 6px; font-family: var(--mono); }
+
+/* ── CHARTS GRID ── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+.chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+.chart-card.span2 { grid-column: span 2; }
+.chart-card.span3 { grid-column: span 3; }
+.chart-title { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px; }
+
+/* Donut */
+.donut-wrap { display: flex; align-items: center; gap: 20px; }
+.donut { width: 100px; height: 100px; border-radius: 50%; flex-shrink: 0; position: relative; }
+.donut-hole { position: absolute; inset: 18px; background: var(--card); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.donut-num { font-size: 18px; font-weight: 700; line-height: 1; }
+.donut-lbl { font-size: 9px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.legend-label { color: var(--muted); flex: 1; }
+.legend-val { font-family: var(--mono); font-size: 11px; color: var(--text); }
+
+/* Bars */
+.bar-list { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-name { font-size: 12px; color: var(--muted); width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; height: 14px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+.bar-num { font-family: var(--mono); font-size: 11px; color: var(--text); width: 28px; text-align: right; }
+
+/* YN bars */
+.yn-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.yn-label { font-size: 12px; color: var(--muted); flex: 0 0 160px; line-height: 1.4; }
+.yn-track { flex: 1; height: 20px; border-radius: 4px; overflow: hidden; display: flex; }
+.yn-yes { background: var(--green); transition: width 0.5s ease; }
+.yn-no { background: var(--red); opacity: 0.7; transition: width 0.5s ease; }
+.yn-stat { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; min-width: 80px; text-align: right; }
+
+/* ── TABLE ── */
+.table-section { margin-bottom: 40px; }
+.table-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.table-title { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+#tbl-search {
+  flex: 1; max-width: 340px; background: var(--card); border: 1px solid var(--border2);
+  border-radius: 9px; color: var(--text); font-family: var(--sans); font-size: 13px;
+  padding: 8px 14px; outline: none; margin-left: auto;
+}
+#tbl-search:focus { border-color: var(--blue); }
+#tbl-search::placeholder { color: var(--muted2); }
+.table-wrap { border-radius: 12px; border: 1px solid var(--border); overflow: hidden; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+thead th {
+  background: var(--surface); padding: 11px 14px; text-align: left;
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--text); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--card2); }
+tbody td { padding: 10px 14px; color: var(--muted); }
+tbody td:first-child { color: var(--text); font-weight: 500; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: var(--mono); font-size: 10px; font-weight: 500; }
+.tag-yes { background: rgba(0,229,160,0.12); color: var(--green); }
+.tag-no { background: rgba(240,90,90,0.12); color: var(--red); }
+.tag-ug { background: rgba(61,142,240,0.12); color: var(--blue); }
+.tag-pg { background: rgba(240,140,61,0.12); color: var(--orange); }
+.pagination { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.pg-btn {
+  padding: 6px 14px; background: var(--card); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 11px;
+  cursor: pointer; transition: all 0.18s;
+}
+.pg-btn:hover { border-color: var(--blue); color: var(--blue); }
+.pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.pg-info { font-family: var(--mono); font-size: 11px; }
+
+/* ── FOOTER ── */
+footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.footer-left { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.footer-left strong { color: var(--green); }
+.footer-right { font-family: var(--mono); font-size: 11px; color: var(--muted2); }
+
+@media(max-width:900px) {
+  header, main, footer { padding-left: 20px; padding-right: 20px; }
+  .metrics-grid { grid-template-columns: repeat(2,1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+  .chart-card.span2, .chart-card.span3 { grid-column: span 1; }
+  .yn-label { flex: 0 0 110px; }
+  .bar-name { width: 80px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="loader-logo">Miva Open University · 2026</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
+  <div class="loader-status" id="loader-status">Connecting to data source…</div>
+</div>
+
+<!-- ERROR -->
+<div id="error-screen">
+  <div class="error-box">
+    <h2>⚠ Could not load data</h2>
+    <p>The dashboard couldn't fetch data from Google Sheets. The most common cause is that the sheet is not set to public. Follow the fix below.</p>
+    <code id="error-url"></code>
+    <p style="margin-top:14px;font-size:13px;">In your Google Sheet go to <strong>Share → Anyone with the link → Viewer</strong>, then try again.</p>
+    <button class="error-btn" onclick="location.reload()">Try again</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <header>
+    <div class="header-left">
+      <div class="header-eyebrow">Miva Open University · Convocation 2026</div>
+      <h1 class="header-title">Response <span>Dashboard</span></h1>
+    </div>
+    <div class="header-right">
+      <div class="data-badge"><strong id="hdr-count">—</strong> responses · updated <span id="hdr-updated">—</span></div>
+      <button class="header-btn btn-refresh" onclick="fetchAndRender()">↺ Refresh</button>
+      <a class="header-btn btn-gh" id="gh-link" href="#" target="_blank">Open Sheet ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- QUERY -->
+    <div class="query-section">
+      <div class="query-label">Query the data</div>
+      <div class="query-pills">
+        <span class="pill" onclick="runQ('summary')">Full summary</span>
+        <span class="pill" onclick="runQ('top locations')">Top locations</span>
+        <span class="pill" onclick="runQ('from Abuja')">Abuja count</span>
+        <span class="pill" onclick="runQ('from Port Harcourt')">Port Harcourt</span>
+        <span class="pill" onclick="runQ('flight interest')">Flight interest</span>
+        <span class="pill" onclick="runQ('airport pickup')">Pickup interest</span>
+        <span class="pill" onclick="runQ('accommodation interest')">Accom interest</span>
+        <span class="pill" onclick="runQ('accommodation preference')">Room preference</span>
+        <span class="pill" onclick="runQ('travelling with guests')">With guests</span>
+        <span class="pill" onclick="runQ('nights breakdown')">Nights needed</span>
+        <span class="pill" onclick="runQ('travel dates')">Travel dates</span>
+        <span class="pill" onclick="runQ('return dates')">Return dates</span>
+        <span class="pill" onclick="runQ('undergraduate postgraduate')">UG vs PG</span>
+        <span class="pill" onclick="runQ('not attending')">Not attending</span>
+      </div>
+      <div class="query-input-row">
+        <input id="q-input" type="text" placeholder="e.g. How many from Kano? · nights breakdown · UG vs PG split" onkeydown="if(event.key==='Enter')runQ(this.value)">
+        <button class="query-btn" onclick="runQ(document.getElementById('q-input').value)">RUN →</button>
+      </div>
+      <div id="q-result"></div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-row">
+      <div class="filter-group"><span class="filter-label">Category</span>
+        <select class="filter-select" id="f-cat" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="Undergraduate">Undergraduate</option>
+          <option value="Postgraduate">Postgraduate</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Attending</span>
+        <select class="filter-select" id="f-att" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Guests</span>
+        <select class="filter-select" id="f-gst" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Room</span>
+        <select class="filter-select" id="f-acc" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="Single">Single</option>
+          <option value="Shared">Shared</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Travel date</span>
+        <select class="filter-select" id="f-td" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="18 June">18 June</option>
+          <option value="19 June">19 June</option>
+          <option value="20 June">20 June</option>
+          <option value="21 June">21 June</option>
+        </select>
+      </div>
+      <span class="filter-count" id="filter-count"></span>
+      <button class="reset-btn" onclick="resetFilters()">Reset</button>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics-grid" id="metrics"></div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Attending ceremony</div>
+        <div id="c-attending"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Category</div>
+        <div id="c-category"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Accommodation preference</div>
+        <div id="c-accom"></div>
+      </div>
+
+      <div class="chart-card span3">
+        <div class="chart-title">Service interest</div>
+        <div id="c-services"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title">Nights needed</div>
+        <div class="bar-list" id="c-nights"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Travel to Lagos</div>
+        <div class="bar-list" id="c-travel"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Return from Lagos</div>
+        <div class="bar-list" id="c-return"></div>
+      </div>
+
+      <div class="chart-card span3">
+        <div class="chart-title">Respondents by location</div>
+        <div class="bar-list" id="c-locations"></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-section">
+      <div class="table-header">
+        <span class="table-title">All respondents</span>
+        <input id="tbl-search" type="text" placeholder="Search name, location, email…" oninput="searchTable()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('name')"># Name</th>
+              <th onclick="sortBy('category')">Category</th>
+              <th onclick="sortBy('location')">Location</th>
+              <th onclick="sortBy('attending')">Attending</th>
+              <th onclick="sortBy('flight')">Flight</th>
+              <th onclick="sortBy('pickup')">Pickup</th>
+              <th onclick="sortBy('accom_int')">Accom.</th>
+              <th onclick="sortBy('with_guests')">Guests</th>
+              <th onclick="sortBy('accom_type')">Room type</th>
+              <th onclick="sortBy('nights')">Nights</th>
+              <th onclick="sortBy('travel_date')">Travel date</th>
+              <th onclick="sortBy('return_date')">Return</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="pg-btn" id="pg-prev" onclick="changePage(-1)">← Prev</button>
+        <span class="pg-info" id="pg-info"></span>
+        <button class="pg-btn" id="pg-next" onclick="changePage(1)">Next →</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-left">Built for <strong>Miva Open University</strong> · Convocation 2026</div>
+    <div class="footer-right">Live data from Google Sheets · auto-refreshes on load</div>
+  </footer>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONFIG — paste your Google Sheet ID below (see footer for instructions)
+// ════════════════════════════════════════════════════════
+const SHEET_ID  = '1izPE2jcI0SMWVQXgwrVNVd7dkpjub4Pqklx3DAHGO0E'; // ← your Sheet ID
+const GID       = '1918259326';  // your specific sheet tab
+
+// Google Sheets public CSV export URL
+const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+
+// CORS proxy — routes the request through a public proxy so browsers allow it
+const CSV_URL = `https://corsproxy.io/?url=${encodeURIComponent(SHEET_CSV)}`;
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let allData = [], filtered = [], tableRows = [];
+let sortKey = 'name', sortDir = 1, currentPage = 1;
+const PAGE_SIZE = 20;
+
+// ════════════════════════════════════════════════════════
+// FETCH & PARSE
+// ════════════════════════════════════════════════════════
+async function fetchAndRender() {
+  setLoader(10, 'Fetching live data from Google Sheets…');
+  document.getElementById('gh-link').href = SHEET_URL;
+  document.getElementById('error-url').textContent = CSV_URL;
+
+  try {
+    const res = await fetch(CSV_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    setLoader(50, 'Parsing responses…');
+    const text = await res.text();
+    allData = parseCSV(text);
+    setLoader(80, 'Rendering dashboard…');
+    document.getElementById('hdr-count').textContent = allData.length;
+    document.getElementById('hdr-updated').textContent = new Date().toLocaleString();
+    applyFilters();
+    setLoader(100, 'Done');
+    setTimeout(() => {
+      document.getElementById('loading-screen').classList.add('hidden');
+      document.getElementById('app').classList.add('ready');
+    }, 400);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('error-screen').classList.add('show');
+  }
+}
+
+function setLoader(pct, msg) {
+  document.getElementById('loader-bar').style.width = pct + '%';
+  document.getElementById('loader-status').textContent = msg;
+}
+
+function parseCSV(text) {
+  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
+  if (lines.length < 2) return [];
+  const first = lines[0];
+  const tabs = (first.match(/\t/g)||[]).length;
+  const commas = (first.match(/,/g)||[]).length;
+  const delim = tabs >= commas ? '\t' : ',';
+
+  function parseRow(line) {
+    if (delim==='\t') return line.split('\t').map(c=>c.trim());
+    const r=[]; let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){inQ=!inQ;}
+      else if(line[i]===','&&!inQ){r.push(cur.trim());cur='';}
+      else cur+=line[i];
+    }
+    r.push(cur.trim()); return r;
+  }
+
+  return lines.slice(1).map((line,idx) => {
+    const r = parseRow(line);
+    return {
+      idx: idx+1,
+      name: ((r[2]||'')+' '+(r[3]||'')).trim(),
+      firstName: r[2]||'', lastName: r[3]||'',
+      email: r[1]||'', phone: r[5]||'',
+      category: r[6]||'',
+      location: normLoc(r[7]||''),
+      attending: r[8]||'',
+      flight: r[9]||'',
+      pickup: r[10]||'',
+      accom_int: r[11]||'',
+      with_guests: r[12]||'',
+      guest_count: r[13]||'',
+      accom_type: r[14]||'',
+      nights: r[15]||'',
+      travel_date: normDate(r[16]||''),
+      return_date: normDate(r[17]||''),
+      notes: r[18]||'',
+    };
+  }).filter(r=>r.name.trim());
+}
+
+function normLoc(loc) {
+  const l = loc.trim().toLowerCase();
+  const map = [
+    [/abuja/, 'Abuja'],
+    [/port.?harcourt|porthac/, 'Port Harcourt'],
+    [/\blagos\b/, 'Lagos'],
+    [/kaduna/, 'Kaduna'],
+    [/\bkano\b/, 'Kano'],
+    [/enugu/, 'Enugu'],
+    [/owerri/, 'Owerri'],
+    [/asaba/, 'Asaba'],
+    [/ibadan/, 'Ibadan'],
+    [/edo|benin.?city/, 'Edo/Benin City'],
+    [/calabar/, 'Calabar'],
+    [/ilorin/, 'Ilorin'],
+    [/gombe/, 'Gombe'],
+    [/\bjos\b/, 'Jos'],
+    [/maiduguri/, 'Maiduguri'],
+    [/delta/, 'Delta'],
+    [/bauchi/, 'Bauchi'],
+    [/zamfara/, 'Zamfara'],
+    [/\babia\b/, 'Abia'],
+    [/uyo|akwa/, 'Akwa Ibom'],
+    [/sokoto/, 'Sokoto'],
+    [/niger.?state|minna/, 'Niger State'],
+    [/ekiti/, 'Ekiti'],
+    [/ondo/, 'Ondo'],
+    [/ogun/, 'Ogun'],
+    [/osun/, 'Osun'],
+    [/kwara/, 'Kwara'],
+    [/anambra|awka|onitsha/, 'Anambra'],
+    [/imo/, 'Imo'],
+    [/rivers/, 'Rivers'],
+    [/cross.?river/, 'Cross River'],
+    [/nasarawa/, 'Nasarawa'],
+    [/plateau/, 'Plateau'],
+    [/taraba/, 'Taraba'],
+    [/adamawa/, 'Adamawa'],
+    [/yobe/, 'Yobe'],
+    [/borno/, 'Borno'],
+    [/kebbi/, 'Kebbi'],
+    [/katsina/, 'Katsina'],
+    [/jigawa/, 'Jigawa'],
+  ];
+  for(const [rx,name] of map) if(rx.test(l)) return name;
+  return loc.trim();
+}
+
+function normDate(d) {
+  d = (d||'').trim();
+  if(!d) return '';
+  const m = d.match(/\b(17|18|19|20|21|22|23|24|25)\b/g);
+  if(m) return [...new Set(m)].map(v=>v+' June').join(', ');
+  return d;
+}
+
+// ════════════════════════════════════════════════════════
+// FILTERS
+// ════════════════════════════════════════════════════════
+function applyFilters() {
+  const cat = document.getElementById('f-cat').value;
+  const att = document.getElementById('f-att').value;
+  const gst = document.getElementById('f-gst').value;
+  const acc = document.getElementById('f-acc').value;
+  const td  = document.getElementById('f-td').value;
+
+  filtered = allData.filter(r => {
+    if(cat && !r.category.includes(cat)) return false;
+    if(att && r.attending !== att) return false;
+    if(gst && r.with_guests !== gst) return false;
+    if(acc && !r.accom_type.includes(acc)) return false;
+    if(td  && !r.travel_date.includes(td)) return false;
+    return true;
+  });
+
+  document.getElementById('filter-count').textContent = filtered.length + ' of ' + allData.length + ' shown';
+  renderMetrics();
+  renderCharts();
+  tableRows = [...filtered];
+  currentPage = 1;
+  renderTable();
+}
+
+function resetFilters() {
+  ['f-cat','f-att','f-gst','f-acc','f-td'].forEach(id => document.getElementById(id).value='');
+  applyFilters();
+}
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+const cnt = (fn) => filtered.filter(fn).length;
+const pct = (v,n) => n ? Math.round(v/n*100) : 0;
+
+function freqMap(field, data) {
+  const d = data || filtered, m = {};
+  d.forEach(r => { const v=r[field]; if(v) m[v]=(m[v]||0)+1; });
+  return m;
+}
+
+// ════════════════════════════════════════════════════════
+// METRICS
+// ════════════════════════════════════════════════════════
+function renderMetrics() {
+  const n = filtered.length;
+  const att = cnt(r=>r.attending==='Yes');
+  const guests = cnt(r=>r.with_guests==='Yes');
+  const flight = cnt(r=>r.flight==='Yes');
+  const notAtt = n - att;
+
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric b"><div class="metric-label">Total responses</div><div class="metric-value">${n}</div></div>
+    <div class="metric g"><div class="metric-label">Attending</div><div class="metric-value">${att}</div><div class="metric-sub">${pct(att,n)}% of respondents</div></div>
+    <div class="metric o"><div class="metric-label">With guests</div><div class="metric-value">${guests}</div><div class="metric-sub">${pct(guests,n)}% bringing others</div></div>
+    <div class="metric p"><div class="metric-label">Want flight</div><div class="metric-value">${flight}</div><div class="metric-sub">${pct(flight,n)}% interested</div></div>
+    <div class="metric r"><div class="metric-label">Not attending</div><div class="metric-value">${notAtt}</div><div class="metric-sub">${pct(notAtt,n)}% declining</div></div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════════════════════
+function donut(elId, segs, centerVal, centerLbl) {
+  const total = segs.reduce((s,x)=>s+x.v,0)||1;
+  let deg=0;
+  const stops = segs.map(s=>{const a=deg,b=deg+=(s.v/total*360);return `${s.c} ${a}deg ${b}deg`;}).join(',');
+  document.getElementById(elId).innerHTML = `
+    <div class="donut-wrap">
+      <div class="donut" style="background:conic-gradient(${stops})">
+        <div class="donut-hole">
+          <div class="donut-num">${centerVal}</div>
+          <div class="donut-lbl">${centerLbl}</div>
+        </div>
+      </div>
+      <div class="donut-legend">
+        ${segs.map(s=>`<div class="legend-row"><div class="legend-dot" style="background:${s.c}"></div><span class="legend-label">${s.l}</span><span class="legend-val">${s.v}</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function bars(elId, items, color) {
+  const max = Math.max(...items.map(x=>x.v),1);
+  document.getElementById(elId).innerHTML = items.map(x=>`
+    <div class="bar-row">
+      <div class="bar-name" title="${x.l}">${x.l}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(x.v/max*100)}%;background:${color}"></div></div>
+      <div class="bar-num">${x.v}</div>
+    </div>`).join('');
+}
+
+function renderCharts() {
+  const d = filtered, n = d.length;
+
+  // Attending
+  const aY=cnt(r=>r.attending==='Yes'), aN=n-aY;
+  donut('c-attending',[{l:'Yes',v:aY,c:'var(--green)'},{l:'No',v:aN,c:'var(--red)'}],aY,'Attending');
+
+  // Category
+  const ug=cnt(r=>r.category.includes('Undergraduate')), pg=cnt(r=>r.category.includes('Postgraduate'));
+  donut('c-category',[{l:'Undergraduate',v:ug,c:'var(--blue)'},{l:'Postgraduate',v:pg,c:'var(--orange)'}],n,'Total');
+
+  // Accom type
+  const si=cnt(r=>r.accom_type.includes('Single')), sh=cnt(r=>r.accom_type.includes('Shared')), no=n-si-sh;
+  donut('c-accom',[{l:'Single',v:si,c:'var(--blue)'},{l:'Shared',v:sh,c:'var(--green)'},{l:'None',v:no,c:'var(--card2)'}],si+sh,'Specified');
+
+  // Services
+  const svcs=[
+    {l:'Flight arrangements', y:cnt(r=>r.flight==='Yes'), n:cnt(r=>r.flight==='No')},
+    {l:'Airport pickup',      y:cnt(r=>r.pickup==='Yes'), n:cnt(r=>r.pickup==='No')},
+    {l:'Accommodation',       y:cnt(r=>r.accom_int==='Yes'), n:cnt(r=>r.accom_int==='No')},
+  ];
+  document.getElementById('c-services').innerHTML = svcs.map(s=>{
+    const t=s.y+s.n||1;
+    return `<div class="yn-row">
+      <div class="yn-label">${s.l}</div>
+      <div class="yn-track">
+        <div class="yn-yes" style="width:${pct(s.y,t)}%"></div>
+        <div class="yn-no" style="width:${pct(s.n,t)}%"></div>
+      </div>
+      <div class="yn-stat">Yes ${s.y} · No ${s.n}</div>
+    </div>`;
+  }).join('');
+
+  // Nights
+  const nm=freqMap('nights');
+  bars('c-nights',['1 night','2 nights','3 nights','More than 3 nights'].map(k=>({l:k,v:nm[k]||0})),'var(--blue)');
+
+  // Travel dates
+  const tm=freqMap('travel_date');
+  const tSorted=Object.entries(tm).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([l,v])=>({l,v}));
+  bars('c-travel', tSorted.length?tSorted:[{l:'No data',v:0}], 'var(--green)');
+
+  // Return dates
+  const rm=freqMap('return_date');
+  const rSorted=Object.entries(rm).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([l,v])=>({l,v}));
+  bars('c-return', rSorted.length?rSorted:[{l:'No data',v:0}], 'var(--orange)');
+
+  // Locations
+  const lm=freqMap('location');
+  const locItems=Object.entries(lm).sort((a,b)=>b[1]-a[1]).slice(0,14).map(([l,v])=>({l,v}));
+  bars('c-locations', locItems, 'var(--purple)');
+}
+
+// ════════════════════════════════════════════════════════
+// TABLE
+// ════════════════════════════════════════════════════════
+function renderTable() {
+  const q = (document.getElementById('tbl-search')?.value||'').toLowerCase();
+  let rows = tableRows.filter(r =>
+    !q || r.name.toLowerCase().includes(q) ||
+    r.location.toLowerCase().includes(q) ||
+    r.email.toLowerCase().includes(q)
+  );
+  rows.sort((a,b) => sortDir * (a[sortKey]||'').localeCompare(b[sortKey]||''));
+  const total=rows.length, pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  currentPage=Math.min(currentPage,pages);
+  const start=(currentPage-1)*PAGE_SIZE, slice=rows.slice(start,start+PAGE_SIZE);
+
+  document.getElementById('pg-info').textContent = `Page ${currentPage} of ${pages} · ${total} records`;
+  document.getElementById('pg-prev').disabled = currentPage<=1;
+  document.getElementById('pg-next').disabled = currentPage>=pages;
+
+  document.getElementById('tbl-body').innerHTML = slice.map((r,i)=>`
+    <tr>
+      <td>${start+i+1}. ${r.name}</td>
+      <td><span class="tag ${r.category.includes('Under')?'tag-ug':'tag-pg'}">${r.category.includes('Under')?'UG':'PG'}</span></td>
+      <td>${r.location}</td>
+      <td><span class="tag ${r.attending==='Yes'?'tag-yes':'tag-no'}">${r.attending||'—'}</span></td>
+      <td><span class="tag ${r.flight==='Yes'?'tag-yes':'tag-no'}">${r.flight||'—'}</span></td>
+      <td><span class="tag ${r.pickup==='Yes'?'tag-yes':'tag-no'}">${r.pickup||'—'}</span></td>
+      <td><span class="tag ${r.accom_int==='Yes'?'tag-yes':'tag-no'}">${r.accom_int||'—'}</span></td>
+      <td><span class="tag ${r.with_guests==='Yes'?'tag-yes':'tag-no'}">${r.with_guests||'—'}</span></td>
+      <td>${(r.accom_type||'').replace('apartment/room','').trim()||'—'}</td>
+      <td>${r.nights||'—'}</td>
+      <td>${r.travel_date||'—'}</td>
+      <td>${r.return_date||'—'}</td>
+    </tr>`).join('');
+}
+
+function searchTable(){ currentPage=1; renderTable(); }
+function sortBy(k){ sortKey===k?sortDir*=-1:(sortKey=k,sortDir=1); renderTable(); }
+function changePage(d){ currentPage+=d; renderTable(); }
+
+// ════════════════════════════════════════════════════════
+// QUERY ENGINE
+// ════════════════════════════════════════════════════════
+function runQ(q) {
+  document.getElementById('q-input').value = q;
+  const ql = q.toLowerCase().trim();
+  const el = document.getElementById('q-result');
+  const d = filtered, n = d.length;
+  if(!n){ el.textContent='No data matches current filters.'; el.style.display='block'; return; }
+
+  const c=(fn)=>d.filter(fn).length;
+  const p=(v)=>n?Math.round(v/n*100):0;
+  const fm=(field)=>{ const m={}; d.forEach(r=>{const v=r[field];if(v)m[v]=(m[v]||0)+1;}); return m; };
+  const rank=(m,lim=12)=>Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,lim).map(([k,v])=>`  • ${k}: ${v} (${p(v)}%)`).join('\n');
+
+  let out='';
+
+  if(/summar/.test(ql)) {
+    const aY=c(r=>r.attending==='Yes'),ug=c(r=>r.category.includes('Under')),pg=c(r=>r.category.includes('Post'));
+    const fY=c(r=>r.flight==='Yes'),pY=c(r=>r.pickup==='Yes'),aI=c(r=>r.accom_int==='Yes'),gY=c(r=>r.with_guests==='Yes');
+    const si=c(r=>r.accom_type.includes('Single')),sh=c(r=>r.accom_type.includes('Shared'));
+    const lm=fm('location'); const top=Object.entries(lm).sort((a,b)=>b[1]-a[1])[0];
+    const nm=fm('nights'); const tn=['1 night','2 nights','3 nights','More than 3 nights'].reduce((a,b)=>(nm[a]||0)>=(nm[b]||0)?a:b);
+    out=`FULL SUMMARY — ${n} respondents\n${'─'.repeat(42)}\nAttendance\n  • Attending:        ${aY} (${p(aY)}%)\n  • Not attending:    ${n-aY} (${p(n-aY)}%)\n\nCategory\n  • Undergraduate:    ${ug} (${p(ug)}%)\n  • Postgraduate:     ${pg} (${p(pg)}%)\n\nService interest\n  • Flight:           ${fY} (${p(fY)}%)\n  • Airport pickup:   ${pY} (${p(pY)}%)\n  • Accommodation:    ${aI} (${p(aI)}%)\n\nTravelling with guests: ${gY} (${p(gY)}%)\nAccom. preference: Single ${si} · Shared ${sh}\nMost common nights: ${tn} (${nm[tn]||0})\nTop location: ${top?top[0]+' ('+top[1]+')':'—'}\n${'─'.repeat(42)}\nTip: click any pill or type a specific query.`;
+  } else if(/top loc|location/.test(ql)) {
+    out=`Top locations (${n} respondents):\n`+rank(fm('location'));
+  } else if(/not attend|declining/.test(ql)) {
+    const v=c(r=>r.attending==='No'); out=`Not attending: ${v} out of ${n} (${p(v)}%)`;
+  } else if(/attend/.test(ql)) {
+    const y=c(r=>r.attending==='Yes'); out=`Attending: ${y} (${p(y)}%)\nNot attending: ${n-y} (${p(n-y)}%)`;
+  } else if(/undergrad|postgrad|ug|pg|categor/.test(ql)) {
+    const ug=c(r=>r.category.includes('Under')),pg=c(r=>r.category.includes('Post'));
+    out=`Category breakdown (${n} total):\n  • Undergraduate: ${ug} (${p(ug)}%)\n  • Postgraduate:  ${pg} (${p(pg)}%)`;
+  } else if(/flight/.test(ql)) {
+    const y=c(r=>r.flight==='Yes'),no=c(r=>r.flight==='No');
+    out=`Flight interest (${n}):\n  • Yes: ${y} (${p(y)}%)\n  • No:  ${no} (${p(no)}%)\n  • No answer: ${n-y-no}`;
+  } else if(/pickup|pick.up|transport/.test(ql)) {
+    const y=c(r=>r.pickup==='Yes'),no=c(r=>r.pickup==='No');
+    out=`Airport pickup interest (${n}):\n  • Yes: ${y} (${p(y)}%)\n  • No:  ${no} (${p(no)}%)\n  • No answer: ${n-y-no}`;
+  } else if(/accom.*interest|interest.*accom/.test(ql)) {
+    const y=c(r=>r.accom_int==='Yes'),no=c(r=>r.accom_int==='No');
+    out=`Accommodation interest (${n}):\n  • Yes: ${y} (${p(y)}%)\n  • No:  ${no} (${p(no)}%)\n  • No answer: ${n-y-no}`;
+  } else if(/pref|single|shared|room/.test(ql)) {
+    const si=c(r=>r.accom_type.includes('Single')),sh=c(r=>r.accom_type.includes('Shared'));
+    out=`Room preference (${n}):\n  • Single: ${si} (${p(si)}%)\n  • Shared: ${sh} (${p(sh)}%)\n  • Not specified: ${n-si-sh}`;
+  } else if(/guest|family|travelling with/.test(ql)) {
+    const y=c(r=>r.with_guests==='Yes'),no=c(r=>r.with_guests==='No');
+    const gcm=fm('guest_count');
+    const gcLines=Object.entries(gcm).filter(([k])=>k&&!k.toLowerCase().includes('not')).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`  • ${k}: ${v}`).join('\n');
+    out=`Travelling with guests (${n}):\n  • Yes: ${y} (${p(y)}%)\n  • No:  ${no} (${p(no)}%)\n\nGuest count breakdown:\n${gcLines||'  No data'}`;
+  } else if(/night|duration|stay/.test(ql)) {
+    const order=['1 night','2 nights','3 nights','More than 3 nights'];
+    const m=fm('nights');
+    const top=order.reduce((a,b)=>(m[a]||0)>=(m[b]||0)?a:b);
+    out=`Nights needed (${n}):\n`+order.map(k=>`  • ${k}: ${m[k]||0} (${p(m[k]||0)}%)`).join('\n')+`\n\nMost common: ${top}`;
+  } else if(/travel date|travel to|depart/.test(ql)) {
+    const m=fm('travel_date');
+    out=`Travel dates to Lagos:\n`+Object.entries(m).sort().map(([k,v])=>`  • ${k}: ${v} (${p(v)}%)`).join('\n');
+  } else if(/return|going back/.test(ql)) {
+    const m=fm('return_date');
+    out=`Return dates from Lagos:\n`+Object.entries(m).sort().map(([k,v])=>`  • ${k}: ${v} (${p(v)}%)`).join('\n');
+  } else {
+    // City lookup
+    const cityMatch = ql.match(/from\s+([a-z\s]+?)(?:\?|$)/)||ql.match(/how many.*?([a-z]{3,})(?:\?|$)/);
+    if(cityMatch) {
+      const city=cityMatch[1].trim();
+      const hits=d.filter(r=>r.location.toLowerCase().includes(city));
+      if(hits.length>0) {
+        out=`Respondents from "${city}": ${hits.length} out of ${n} (${p(hits.length)}%)`;
+      } else {
+        out=`No results for "${city}".\n\nTop locations:\n`+rank(fm('location'),8);
+      }
+    } else {
+      out=`No specific match for "${q}".\n\nTry: summary · top locations · flight interest · nights breakdown · from [city]`;
+    }
+  }
+
+  el.textContent=out;
+  el.style.display='block';
+}
+
+// ════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════
+fetchAndRender();
+</script>
+</body>
+</html>
