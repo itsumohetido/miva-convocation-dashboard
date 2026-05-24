@@ -268,9 +268,9 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 <div id="error-screen">
   <div class="error-box">
     <h2>⚠ Could not load data</h2>
-    <p>The dashboard couldn't fetch the CSV file from GitHub. Make sure you've followed the setup guide and the GitHub URL below is correct.</p>
+    <p>The dashboard couldn't fetch data from Google Sheets. The most common cause is that the sheet is not set to public. Follow the fix below.</p>
     <code id="error-url"></code>
-    <p style="margin-top:14px;font-size:13px;">Double-check your GitHub username, repository name, and that the CSV file is named <strong>responses.csv</strong>.</p>
+    <p style="margin-top:14px;font-size:13px;">In your Google Sheet go to <strong>Share → Anyone with the link → Viewer</strong>, then try again.</p>
     <button class="error-btn" onclick="location.reload()">Try again</button>
   </div>
 </div>
@@ -285,7 +285,7 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
     <div class="header-right">
       <div class="data-badge"><strong id="hdr-count">—</strong> responses · updated <span id="hdr-updated">—</span></div>
       <button class="header-btn btn-refresh" onclick="fetchAndRender()">↺ Refresh</button>
-      <a class="header-btn btn-gh" id="gh-link" href="#" target="_blank">GitHub ↗</a>
+      <a class="header-btn btn-gh" id="gh-link" href="#" target="_blank">Open Sheet ↗</a>
     </div>
   </header>
 
@@ -438,20 +438,20 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 
   <footer>
     <div class="footer-left">Built for <strong>Miva Open University</strong> · Convocation 2026</div>
-    <div class="footer-right">Data hosted on GitHub · auto-refreshes on load</div>
+    <div class="footer-right">Live data from Google Sheets · auto-refreshes on load</div>
   </footer>
 </div>
 
 <script>
 // ════════════════════════════════════════════════════════
-// CONFIG — update this one line with your GitHub details
+// CONFIG — paste your Google Sheet ID below (see footer for instructions)
 // ════════════════════════════════════════════════════════
-const GITHUB_USER = 'itsumohetido';
-const GITHUB_REPO = 'miva-convocation-dashboard';
-const CSV_FILE    = 'responses.csv';   // name of the file you upload to GitHub
+const SHEET_ID  = '1izPE2jcI0SMWVQXgwrVNVd7dkpjub4Pqklx3DAHGO0E'; // ← your Sheet ID
+const GID       = '1918259326';  // your specific sheet tab
 
-// Derived raw URL (do not edit)
-const CSV_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${CSV_FILE}`;
+// Google Sheets public CSV export URL (always live, no download needed)
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 
 // ════════════════════════════════════════════════════════
 // STATE
@@ -464,8 +464,8 @@ const PAGE_SIZE = 20;
 // FETCH & PARSE
 // ════════════════════════════════════════════════════════
 async function fetchAndRender() {
-  setLoader(10, 'Fetching data from GitHub…');
-  document.getElementById('gh-link').href = `https://github.com/${GITHUB_USER}/${GITHUB_REPO}`;
+  setLoader(10, 'Fetching live data from Google Sheets…');
+  document.getElementById('gh-link').href = SHEET_URL;
   document.getElementById('error-url').textContent = CSV_URL;
 
   try {
