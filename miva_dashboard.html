@@ -268,9 +268,9 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 <div id="error-screen">
   <div class="error-box">
     <h2>⚠ Could not load data</h2>
-    <p>The dashboard couldn't fetch data from Google Sheets. The most common cause is that the sheet is not set to public. Follow the fix below.</p>
+    <p>The dashboard couldn't fetch data. Your Apps Script URL may not be set correctly, or the script wasn't deployed properly.</p>
     <code id="error-url"></code>
-    <p style="margin-top:14px;font-size:13px;">In your Google Sheet go to <strong>Share → Anyone with the link → Viewer</strong>, then try again.</p>
+    <p style="margin-top:14px;font-size:13px;">Make sure you completed the Apps Script setup and pasted the correct Web App URL into the dashboard.</p>
     <button class="error-btn" onclick="location.reload()">Try again</button>
   </div>
 </div>
@@ -449,12 +449,12 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 const SHEET_ID  = '1izPE2jcI0SMWVQXgwrVNVd7dkpjub4Pqklx3DAHGO0E'; // ← your Sheet ID
 const GID       = '1918259326';  // your specific sheet tab
 
-// Google Sheets public CSV export URL
-const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 
-// CORS proxy — routes the request through a public proxy so browsers allow it
-const CSV_URL = `https://corsproxy.io/?url=${encodeURIComponent(SHEET_CSV)}`;
+// ── APPS SCRIPT WEB APP URL ──────────────────────────────────────────────────
+// Paste your deployed Apps Script URL here after following the setup steps
+const CSV_URL = 'https://script.google.com/macros/s/AKfycbyM8AU3gGDfl6HjUVpdtnxlN4Rc5Y9GOxJjQDYnWCNblNzBMZShhzI101QsnPwPK_3C/exec';
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ════════════════════════════════════════════════════════
 // STATE
