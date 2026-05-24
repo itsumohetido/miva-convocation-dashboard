@@ -538,7 +538,14 @@ function parseCSV(text) {
       return_date: normDate(r[17]||''),
       notes: r[18]||'',
     };
-  }).filter(r=>r.name.trim());
+  }).filter(r => {
+    // Must have a real name and a timestamp to count as a valid response
+    const hasName = r.name.trim().length > 1;
+    const hasTimestamp = r.idx > 0 && (r.timestamp || '').trim().length > 0;
+    // Skip rows that look like extra headers (e.g. "First Name Last Name")
+    const isHeaderRow = r.firstName.toLowerCase().includes('first') && r.lastName.toLowerCase().includes('last');
+    return hasName && hasTimestamp && !isHeaderRow;
+  });
 }
 
 function normLoc(loc) {
