@@ -1,4 +1,6 @@
-# miva-convocation-dashboard
- Miva Convocation 2026 Response Dashboard
+# Miva Convocation 2026 Travel & Accommodation Analytics Dashboard
 
-**View Dashboard:** https://itsumohetido.github.io/miva-convocation-dashboard/miva_dashboard.html
+   Real-time RSVP analytics for Miva Convocation 2026.
+
+   ## View Dashboard
+   - 📊 [View Dashboard](miva_dashboard.html)
