@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Miva Convocation 2026 — Response Dashboard</title>
+<title>Miva Convocation Travel HQ</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root {
-  --bg: #080b10;
-  --surface: #0f1318;
-  --card: #141920;
-  --card2: #1a2030;
+  --bg: #04111e;
+  --surface: #071d2e;
+  --card: #09314F;
+  --card2: #0d3d62;
   --border: rgba(255,255,255,0.07);
   --border2: rgba(255,255,255,0.12);
-  --green: #00e5a0;
-  --blue: #3d8ef0;
-  --orange: #f08c3d;
-  --red: #f05a5a;
-  --purple: #9b7ff0;
-  --text: #eef0f5;
-  --muted: #6b7a8f;
-  --muted2: #4a5568;
+  --green: #B79A7F;
+  --blue: #09314F;
+  --orange: #F8F5F2;
+  --red: #e53c29;
+  --purple: #B79A7F;
+  --text: #F8F5F2;
+  --muted: #a89880;
+  --muted2: #5c6a7a;
   --mono: 'JetBrains Mono', monospace;
   --sans: 'Space Grotesk', sans-serif;
 }
@@ -49,7 +49,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
   align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 999;
 }
 #error-screen.show { display: flex; }
-.error-box { background: var(--card); border: 1px solid rgba(240,90,90,0.3); border-radius: 12px; padding: 32px 40px; max-width: 500px; text-align: center; }
+.error-box { background: var(--card); border: 1px solid rgba(229,60,41,0.3); border-radius: 12px; padding: 32px 40px; max-width: 500px; text-align: center; }
 .error-box h2 { color: var(--red); font-size: 18px; margin-bottom: 12px; }
 .error-box p { color: var(--muted); font-size: 14px; line-height: 1.7; }
 .error-box code { display: block; margin-top: 16px; padding: 12px; background: var(--bg); border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--orange); word-break: break-all; }
@@ -63,7 +63,7 @@ header {
   padding: 28px 40px 24px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-  position: sticky; top: 0; background: rgba(8,11,16,0.92);
+  position: sticky; top: 0; background: rgba(4,17,30,0.92);
   backdrop-filter: blur(12px); z-index: 100;
 }
 .header-left {}
@@ -79,7 +79,7 @@ header {
   text-transform: uppercase; transition: all 0.2s; text-decoration: none; display: inline-block;
 }
 .btn-refresh { background: transparent; border-color: var(--blue); color: var(--blue); }
-.btn-refresh:hover { background: rgba(61,142,240,0.1); }
+.btn-refresh:hover { background: rgba(9,49,79,0.15); }
 .btn-gh { background: transparent; border-color: var(--border2); color: var(--muted); }
 .btn-gh:hover { border-color: var(--text); color: var(--text); }
 
@@ -88,19 +88,19 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 /* ── QUERY BOX ── */
 .query-section {
   margin-bottom: 32px;
-  background: linear-gradient(135deg, rgba(0,229,160,0.06), rgba(61,142,240,0.04));
-  border: 1px solid rgba(0,229,160,0.2);
+  background: linear-gradient(135deg, rgba(183,154,127,0.06), rgba(9,49,79,0.04));
+  border: 1px solid rgba(183,154,127,0.2);
   border-radius: 16px; padding: 24px;
 }
 .query-label { font-family: var(--mono); font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-.query-label::after { content: ''; flex: 1; height: 1px; background: rgba(0,229,160,0.2); }
+.query-label::after { content: ''; flex: 1; height: 1px; background: rgba(183,154,127,0.2); }
 .query-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .pill {
   padding: 5px 14px; border-radius: 20px; font-size: 12px; font-family: var(--mono);
   color: var(--muted); background: var(--card); border: 1px solid var(--border2);
   cursor: pointer; transition: all 0.18s; white-space: nowrap;
 }
-.pill:hover { color: var(--green); border-color: rgba(0,229,160,0.4); background: rgba(0,229,160,0.05); }
+.pill:hover { color: var(--green); border-color: rgba(183,154,127,0.4); background: rgba(183,154,127,0.05); }
 .query-input-row { display: flex; gap: 10px; }
 #q-input {
   flex: 1; background: var(--bg); border: 1px solid var(--border2);
@@ -225,10 +225,10 @@ tbody tr:hover { background: var(--card2); }
 tbody td { padding: 10px 14px; color: var(--muted); }
 tbody td:first-child { color: var(--text); font-weight: 500; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: var(--mono); font-size: 10px; font-weight: 500; }
-.tag-yes { background: rgba(0,229,160,0.12); color: var(--green); }
-.tag-no { background: rgba(240,90,90,0.12); color: var(--red); }
-.tag-ug { background: rgba(61,142,240,0.12); color: var(--blue); }
-.tag-pg { background: rgba(240,140,61,0.12); color: var(--orange); }
+.tag-yes { background: rgba(183,154,127,0.12); color: var(--green); }
+.tag-no { background: rgba(229,60,41,0.12); color: var(--red); }
+.tag-ug { background: rgba(9,49,79,0.15); color: var(--blue); }
+.tag-pg { background: rgba(183,154,127,0.15); color: var(--orange); }
 .pagination { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; color: var(--muted); }
 .pg-btn {
   padding: 6px 14px; background: var(--card); border: 1px solid var(--border2);
