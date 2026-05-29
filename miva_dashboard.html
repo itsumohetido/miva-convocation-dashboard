@@ -200,9 +200,10 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .loc-table tbody tr:hover { background: var(--card2); }
 .loc-table tbody td { padding: 8px 10px; }
 .loc-name { color: var(--text); font-weight: 500; }
+.loc-flag { font-size: 14px; margin-right: 6px; }
 .loc-num { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
 .loc-total { font-family: var(--mono); font-size: 12px; color: var(--gold); text-align: right; font-weight: 600; }
-.loc-bar-cell { width: 120px; padding-right: 14px; }
+.loc-bar-cell { width: 140px; padding-right: 14px; }
 .loc-bar-split { height: 6px; border-radius: 3px; overflow: hidden; display: flex; }
 .loc-bar-students { background: var(--cream); }
 .loc-bar-guests { background: var(--gold); opacity: 0.6; }
@@ -211,6 +212,8 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .loc-totals-row .loc-total { color: var(--cream); font-size: 13px; }
 .headcount-legend { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
 .hc-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.intl-divider td { padding: 6px 10px 4px; }
+.intl-divider .loc-name { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted2); }
 
 .table-section { margin-bottom: 40px; }
 .table-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -400,26 +403,26 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
       </div>
 
       <div class="chart-card span3">
-        <div class="chart-title">Respondents by location</div>
+        <div class="chart-title">Respondents by state</div>
         <div class="bar-list" id="c-locations"></div>
       </div>
 
-      <!-- ── NEW: HEADCOUNT BY LOCATION ── -->
+      <!-- HEADCOUNT BY STATE -->
       <div class="chart-card span3">
-        <div class="chart-title">Headcount by location — students + guests coming to Lagos</div>
+        <div class="chart-title">Headcount by state — students + guests coming to Lagos</div>
         <div class="headcount-legend">
           <span><span class="hc-dot" style="background:var(--cream)"></span><span style="font-size:12px;color:var(--muted)">Students attending</span></span>
           <span><span class="hc-dot" style="background:var(--gold);opacity:0.8"></span><span style="font-size:12px;color:var(--muted)">Estimated guests</span></span>
-          <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted2)">Bar = share of grand total headcount</span>
+          <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted2)">Bar = share of location's max headcount</span>
         </div>
         <table class="loc-table">
           <thead>
             <tr>
-              <th>Location</th>
+              <th>State / Location</th>
               <th style="text-align:right">Students</th>
               <th style="text-align:right">Est. guests</th>
               <th style="text-align:right">Total</th>
-              <th style="text-align:left;padding-left:10px;width:140px">Breakdown</th>
+              <th style="text-align:left;padding-left:10px;width:160px">Breakdown</th>
             </tr>
           </thead>
           <tbody id="c-headcount-body"></tbody>
@@ -439,7 +442,7 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
               <th onclick="sortBy('name')"># Name</th>
               <th onclick="sortBy('category')">Category</th>
               <th onclick="sortBy('phone')">Phone</th>
-              <th onclick="sortBy('location')">Location</th>
+              <th onclick="sortBy('location')">State</th>
               <th onclick="sortBy('attending')">Attending</th>
               <th onclick="sortBy('flight')">Flight</th>
               <th onclick="sortBy('pickup')">Pickup</th>
@@ -477,6 +480,162 @@ const CSV_URL   = 'https://script.google.com/macros/s/AKfycbzmTBfenD_WOOY9VEHb-e
 let allData = [], filtered = [], tableRows = [];
 let sortKey = 'name', sortDir = 1, currentPage = 1;
 const PAGE_SIZE = 20;
+
+// ─── LOCATION NORMALISER ────────────────────────────────────────────────────
+// Maps any city, LGA, or colloquial name → Nigerian state or country name.
+// Order matters: more specific patterns first.
+function normLoc(raw) {
+  const l = (raw || '').trim().toLowerCase();
+  if (!l) return '';
+
+  // ── International (check before Nigerian states) ──
+  const intl = [
+    [/\buk\b|united kingdom|england|london|manchester|birmingham|leeds|scotland|wales/, 'United Kingdom'],
+    [/\busa\b|\bunited states\b|\bamerica\b|new york|california|texas|chicago|houston|atlanta/, 'United States'],
+    [/\bcanada\b|toronto|ontario|vancouver|calgary|montreal/, 'Canada'],
+    [/\bgermany\b|berlin|munich|frankfurt/, 'Germany'],
+    [/\bghana\b|accra|kumasi/, 'Ghana'],
+    [/\bsouth africa\b|johannesburg|cape town|pretoria/, 'South Africa'],
+    [/\baustralia\b|sydney|melbourne|brisbane/, 'Australia'],
+    [/\bdubai\b|\buae\b|abu dhabi|emirates/, 'UAE'],
+    [/\bireland\b|dublin/, 'Ireland'],
+    [/\bkenya\b|nairobi/, 'Kenya'],
+    [/\brunited arab emirates\b/, 'UAE'],
+    [/\bnetherlands\b|amsterdam/, 'Netherlands'],
+    [/\bfrance\b|paris/, 'France'],
+    [/\bitaly\b|rome|milan/, 'Italy'],
+    [/\bspain\b|madrid|barcelona/, 'Spain'],
+    [/\bindian?\b|mumbai|delhi|bangalore/, 'India'],
+  ];
+  for (const [rx, name] of intl) if (rx.test(l)) return name;
+
+  // ── FCT / Abuja ──
+  if (/abuja|fct|gwagwa|lugbe|kubwa|nyanya|kuje|bwari|gwagwalada|karshi|suleja/.test(l)) return 'FCT – Abuja';
+
+  // ── Lagos State ──
+  if (/\blagos\b|ikeja|lekki|surulere|yaba|victoria island|vi\b|ikorodu|badagry|epe\b|ajah|festac|isale.eko|apapa|oshodi|mushin|agege|alimosho|kosofe|maryland|sangotedo|ibeju/.test(l)) return 'Lagos State';
+
+  // ── Rivers State ──
+  if (/port.?harcourt|porthac|rivers|obio|akpor|eleme|bonny|degema|khana|oyigbo|omoku/.test(l)) return 'Rivers State';
+
+  // ── Kano State ──
+  if (/\bkano\b|dala|fagge|gwale|kumbotso|nasarawa kano|ungogo|tarauni/.test(l)) return 'Kano State';
+
+  // ── Kaduna State ──
+  if (/kaduna|zaria|kafanchan|soba|birnin.?gwari|chikun|igabi/.test(l)) return 'Kaduna State';
+
+  // ── Oyo State ──
+  if (/ibadan|oyo\b|ogbomoso|iseyin|saki\b|oyo state|egbeda|akinyele|lagelu|oluyole/.test(l)) return 'Oyo State';
+
+  // ── Osun State ──
+  if (/osun|ile.?ife|ife\b|ilesa|ede\b|osogbo|iwo\b|ikirun|modakeke|ejigbo|gbongan/.test(l)) return 'Osun State';
+
+  // ── Ogun State ──
+  if (/ogun|abeokuta|sagamu|ijebu.?ode|ota\b|ifo\b|ewekoro|remo/.test(l)) return 'Ogun State';
+
+  // ── Ondo State ──
+  if (/ondo|akure|owo\b|okitipupa|ile.?oluji|ose\b|idanre|irele/.test(l)) return 'Ondo State';
+
+  // ── Ekiti State ──
+  if (/ekiti|ado.?ekiti|ikere|ilawe|ijero|efon|oye\b/.test(l)) return 'Ekiti State';
+
+  // ── Kwara State ──
+  if (/kwara|ilorin|offa\b|oro\b|kaiama|share\b|jebba/.test(l)) return 'Kwara State';
+
+  // ── Anambra State ──
+  if (/anambra|awka|onitsha|nnewi|ekwulobia|agulu|ogidi|ihiala|ozubulu/.test(l)) return 'Anambra State';
+
+  // ── Enugu State ──
+  if (/enugu|nsukka|oji.?river|agbani|coal camp|emene/.test(l)) return 'Enugu State';
+
+  // ── Imo State ──
+  if (/\bimo\b|owerri|orlu\b|okigwe|mbaise|oguta/.test(l)) return 'Imo State';
+
+  // ── Abia State ──
+  if (/\babia\b|umuahia|aba\b|arochukwu|ohafia/.test(l)) return 'Abia State';
+
+  // ── Cross River State ──
+  if (/cross.?river|calabar|ogoja|ikom\b|obudu/.test(l)) return 'Cross River State';
+
+  // ── Akwa Ibom State ──
+  if (/akwa.?ibom|uyo\b|eket|ikot.?ekpene|oron\b/.test(l)) return 'Akwa Ibom State';
+
+  // ── Delta State ──
+  if (/delta|asaba|warri|sapele|agbor|abraka|ughelli|ozoro/.test(l)) return 'Delta State';
+
+  // ── Edo State ──
+  if (/\bedo\b|benin.?city|auchi|ekpoma|uromi|igarra|sabongida/.test(l)) return 'Edo State';
+
+  // ── Bayelsa State ──
+  if (/bayelsa|yenagoa|ogbia|sagbama|nembe/.test(l)) return 'Bayelsa State';
+
+  // ── Kogi State ──
+  if (/kogi|lokoja|okene|kabba|ankpa|idah/.test(l)) return 'Kogi State';
+
+  // ── Benue State ──
+  if (/benue|makurdi|gboko|otukpo|katsina.?ala|vandeikya/.test(l)) return 'Benue State';
+
+  // ── Nasarawa State ──
+  if (/nasarawa|lafia\b|keffi\b|akwanga|doma\b/.test(l)) return 'Nasarawa State';
+
+  // ── Niger State ──
+  if (/niger.?state|minna|bida\b|suleja|kontagora|lapai/.test(l)) return 'Niger State';
+
+  // ── Plateau State ──
+  if (/plateau|jos\b|shendam|pankshin|barkin.?ladi/.test(l)) return 'Plateau State';
+
+  // ── Taraba State ──
+  if (/taraba|jalingo|wukari|bali\b|serti/.test(l)) return 'Taraba State';
+
+  // ── Adamawa State ──
+  if (/adamawa|yola\b|mubi\b|numan|jimeta/.test(l)) return 'Adamawa State';
+
+  // ── Gombe State ──
+  if (/gombe|kaltungo|billiri|dukku/.test(l)) return 'Gombe State';
+
+  // ── Bauchi State ──
+  if (/bauchi|azare|misau|katagum|jamaare/.test(l)) return 'Bauchi State';
+
+  // ── Borno State ──
+  if (/borno|maiduguri|biu\b|gwoza|chibok/.test(l)) return 'Borno State';
+
+  // ── Yobe State ──
+  if (/yobe|damaturu|potiskum|nguru|gashua/.test(l)) return 'Yobe State';
+
+  // ── Jigawa State ──
+  if (/jigawa|dutse\b|hadejia|kazaure|gumel/.test(l)) return 'Jigawa State';
+
+  // ── Katsina State ──
+  if (/katsina|daura\b|funtua|malumfashi|mani\b/.test(l)) return 'Katsina State';
+
+  // ── Kebbi State ──
+  if (/kebbi|birnin.?kebbi|argungu|yauri\b|zuru\b/.test(l)) return 'Kebbi State';
+
+  // ── Sokoto State ──
+  if (/sokoto|tambuwal|illela|bodinga/.test(l)) return 'Sokoto State';
+
+  // ── Zamfara State ──
+  if (/zamfara|gusau|kaura.?namoda|talata|mafara/.test(l)) return 'Zamfara State';
+
+  // ── Ebonyi State ──
+  if (/ebonyi|abakaliki|ishielu|ivo\b|ohaozara/.test(l)) return 'Ebonyi State';
+
+  // Fallback: return trimmed original
+  return raw.trim();
+}
+
+// Is this location outside Nigeria?
+function isInternational(loc) {
+  const nigerian = /state$|^fct/i;
+  const known = ['FCT – Abuja','Lagos State','Rivers State','Kano State','Kaduna State',
+    'Oyo State','Osun State','Ogun State','Ondo State','Ekiti State','Kwara State',
+    'Anambra State','Enugu State','Imo State','Abia State','Cross River State',
+    'Akwa Ibom State','Delta State','Edo State','Bayelsa State','Kogi State',
+    'Benue State','Nasarawa State','Niger State','Plateau State','Taraba State',
+    'Adamawa State','Gombe State','Bauchi State','Borno State','Yobe State',
+    'Jigawa State','Katsina State','Kebbi State','Sokoto State','Zamfara State','Ebonyi State'];
+  return !known.includes(loc);
+}
 
 async function fetchAndRender() {
   setLoader(10, 'Fetching live data from Google Sheets…');
@@ -548,54 +707,6 @@ function parseCSV(text) {
       notes: r[18]||'',
     };
   }).filter(r => r.name.trim().length > 1);
-}
-
-function normLoc(loc) {
-  const l = loc.trim().toLowerCase();
-  const map = [
-    [/abuja/, 'Abuja'],
-    [/port.?harcourt|porthac/, 'Port Harcourt'],
-    [/\blagos\b/, 'Lagos'],
-    [/kaduna/, 'Kaduna'],
-    [/\bkano\b/, 'Kano'],
-    [/enugu/, 'Enugu'],
-    [/owerri/, 'Owerri'],
-    [/asaba/, 'Asaba'],
-    [/ibadan/, 'Ibadan'],
-    [/edo|benin.?city/, 'Edo/Benin City'],
-    [/calabar/, 'Calabar'],
-    [/ilorin/, 'Ilorin'],
-    [/gombe/, 'Gombe'],
-    [/\bjos\b/, 'Jos'],
-    [/maiduguri/, 'Maiduguri'],
-    [/delta/, 'Delta'],
-    [/bauchi/, 'Bauchi'],
-    [/zamfara/, 'Zamfara'],
-    [/\babia\b/, 'Abia'],
-    [/uyo|akwa/, 'Akwa Ibom'],
-    [/sokoto/, 'Sokoto'],
-    [/niger.?state|minna/, 'Niger State'],
-    [/ekiti/, 'Ekiti'],
-    [/ondo/, 'Ondo'],
-    [/ogun/, 'Ogun'],
-    [/osun/, 'Osun'],
-    [/kwara/, 'Kwara'],
-    [/anambra|awka|onitsha/, 'Anambra'],
-    [/imo/, 'Imo'],
-    [/rivers/, 'Rivers'],
-    [/cross.?river/, 'Cross River'],
-    [/nasarawa/, 'Nasarawa'],
-    [/plateau/, 'Plateau'],
-    [/taraba/, 'Taraba'],
-    [/adamawa/, 'Adamawa'],
-    [/yobe/, 'Yobe'],
-    [/borno/, 'Borno'],
-    [/kebbi/, 'Kebbi'],
-    [/katsina/, 'Katsina'],
-    [/jigawa/, 'Jigawa'],
-  ];
-  for(const [rx,name] of map) if(rx.test(l)) return name;
-  return loc.trim();
 }
 
 function normDate(d) {
@@ -692,7 +803,6 @@ function parseGuests(r) {
   if (!isNaN(num) && num > 0) return num;
   const words = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10 };
   for (const [word, val] of Object.entries(words)) if (raw.includes(word)) return val;
-  // Said yes to guests but no count given — assume 1
   return 1;
 }
 
@@ -737,10 +847,10 @@ function renderCharts() {
   bars('c-return', rSorted.length?rSorted:[{l:'No data',v:0}], 'var(--red)');
 
   const lm=freqMap('location');
-  const locItems=Object.entries(lm).sort((a,b)=>b[1]-a[1]).slice(0,14).map(([l,v])=>({l,v}));
+  const locItems=Object.entries(lm).sort((a,b)=>b[1]-a[1]).slice(0,16).map(([l,v])=>({l,v}));
   bars('c-locations', locItems, 'var(--gold)');
 
-  // ── HEADCOUNT BY LOCATION ──
+  // ── HEADCOUNT BY STATE ──────────────────────────────────────────────────
   const att = d.filter(r => r.attending === 'Yes');
   const locMap = {};
   att.forEach(r => {
@@ -750,40 +860,54 @@ function renderCharts() {
     locMap[loc].guests += parseGuests(r);
   });
 
-  const hcRows = Object.entries(locMap)
-    .map(([loc, v]) => ({ loc, students: v.students, guests: v.guests, total: v.students + v.guests }))
+  const allRows = Object.entries(locMap)
+    .map(([loc, v]) => ({ loc, students: v.students, guests: v.guests, total: v.students + v.guests, intl: isInternational(loc) }))
     .sort((a, b) => b.total - a.total);
 
-  const grandStudents = hcRows.reduce((s, r) => s + r.students, 0);
-  const grandGuests   = hcRows.reduce((s, r) => s + r.guests, 0);
+  const nigRows  = allRows.filter(r => !r.intl);
+  const intlRows = allRows.filter(r => r.intl);
+
+  const grandStudents = allRows.reduce((s, r) => s + r.students, 0);
+  const grandGuests   = allRows.reduce((s, r) => s + r.guests, 0);
   const grandTotal    = grandStudents + grandGuests;
-  const maxTotal      = hcRows[0]?.total || 1;
+  const maxTotal      = allRows[0]?.total || 1;
+
+  function rowHTML(r) {
+    const stuPct = Math.round(r.students / maxTotal * 100);
+    const gstPct = Math.round(r.guests   / maxTotal * 100);
+    const flag   = r.intl ? '🌍 ' : '';
+    return `<tr>
+      <td class="loc-name">${flag}${r.loc}</td>
+      <td class="loc-num">${r.students}</td>
+      <td class="loc-num">${r.guests}</td>
+      <td class="loc-total">${r.total}</td>
+      <td style="padding-right:14px;width:160px">
+        <div class="loc-bar-split">
+          <div class="loc-bar-students" style="width:${stuPct}%"></div>
+          <div class="loc-bar-guests"   style="width:${gstPct}%"></div>
+        </div>
+      </td>
+    </tr>`;
+  }
 
   const bodyEl = document.getElementById('c-headcount-body');
   if (bodyEl) {
-    bodyEl.innerHTML = hcRows.map(r => {
-      const stuPct = Math.round(r.students / maxTotal * 100);
-      const gstPct = Math.round(r.guests   / maxTotal * 100);
-      return `<tr>
-        <td class="loc-name">${r.loc}</td>
-        <td class="loc-num">${r.students}</td>
-        <td class="loc-num">${r.guests}</td>
-        <td class="loc-total">${r.total}</td>
-        <td style="padding-right:14px;width:140px">
-          <div class="loc-bar-split">
-            <div class="loc-bar-students" style="width:${stuPct}%"></div>
-            <div class="loc-bar-guests"   style="width:${gstPct}%"></div>
-          </div>
-        </td>
-      </tr>`;
-    }).join('') + `
-    <tr class="loc-totals-row">
+    let html = nigRows.map(rowHTML).join('');
+
+    if (intlRows.length) {
+      html += `<tr class="intl-divider"><td class="loc-name" colspan="5" style="padding-top:14px;padding-bottom:2px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted2)">— Outside Nigeria —</td></tr>`;
+      html += intlRows.map(rowHTML).join('');
+    }
+
+    html += `<tr class="loc-totals-row">
       <td class="loc-name">Grand total</td>
       <td class="loc-num" style="color:var(--cream);font-weight:600">${grandStudents}</td>
       <td class="loc-num" style="color:var(--cream);font-weight:600">${grandGuests}</td>
       <td class="loc-total" style="font-size:14px;color:var(--cream)">${grandTotal}</td>
       <td></td>
     </tr>`;
+
+    bodyEl.innerHTML = html;
   }
 }
 
