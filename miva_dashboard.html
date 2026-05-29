@@ -30,7 +30,6 @@
 html { scroll-behavior: smooth; }
 body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-/* ── LOADING SCREEN ── */
 #loading-screen {
   position: fixed; inset: 0; background: var(--bg);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -42,7 +41,6 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .loader-bar { height: 100%; background: var(--gold); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
 .loader-status { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-/* ── ERROR SCREEN ── */
 #error-screen {
   display: none; position: fixed; inset: 0; background: var(--bg);
   align-items: center; justify-content: center; flex-direction: column; gap: 16px; z-index: 999;
@@ -54,7 +52,6 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); min-
 .error-box code { display: block; margin-top: 16px; padding: 12px; background: var(--bg); border-radius: 8px; font-family: var(--mono); font-size: 12px; color: var(--gold); word-break: break-all; }
 .error-btn { margin-top: 20px; padding: 10px 24px; background: var(--red); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-family: var(--sans); font-size: 14px; font-weight: 600; }
 
-/* ── LAYOUT ── */
 #app { display: none; }
 #app.ready { display: block; }
 
@@ -65,7 +62,6 @@ header {
   position: sticky; top: 0; background: rgba(2,34,58,0.92);
   backdrop-filter: blur(12px); z-index: 100;
 }
-.header-left {}
 .header-eyebrow { font-family: var(--mono); font-size: 10px; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
 .header-title { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
 .header-title span { color: var(--gold); }
@@ -84,7 +80,6 @@ header {
 
 main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 
-/* ── QUERY BOX ── */
 .query-section {
   margin-bottom: 32px;
   background: linear-gradient(135deg, rgba(183,154,127,0.08), rgba(248,245,242,0.05));
@@ -120,7 +115,6 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
   background: var(--bg); border-radius: 10px; padding: 16px; border: 1px solid var(--border);
 }
 
-/* ── FILTERS ── */
 .filters-row {
   display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
   margin-bottom: 28px; padding: 16px 20px;
@@ -142,7 +136,6 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 }
 .reset-btn:hover { border-color: var(--red); color: var(--red); }
 
-/* ── METRICS ── */
 .metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
 .metric {
   background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -163,14 +156,12 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .metric.p .metric-value { color: var(--gold); }
 .metric-sub { font-size: 12px; color: var(--muted); margin-top: 6px; font-family: var(--mono); }
 
-/* ── CHARTS GRID ── */
 .charts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 28px; }
 .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
 .chart-card.span2 { grid-column: span 2; }
 .chart-card.span3 { grid-column: span 3; }
 .chart-title { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px; }
 
-/* Donut */
 .donut-wrap { display: flex; align-items: center; gap: 20px; }
 .donut { width: 100px; height: 100px; border-radius: 50%; flex-shrink: 0; position: relative; }
 .donut-hole { position: absolute; inset: 18px; background: var(--card); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -182,7 +173,6 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .legend-label { color: var(--muted); flex: 1; }
 .legend-val { font-family: var(--mono); font-size: 11px; color: var(--text); }
 
-/* Bars */
 .bar-list { display: flex; flex-direction: column; gap: 10px; }
 .bar-row { display: flex; align-items: center; gap: 10px; }
 .bar-name { font-size: 12px; color: var(--muted); width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -190,7 +180,6 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
 .bar-num { font-family: var(--mono); font-size: 11px; color: var(--text); width: 28px; text-align: right; }
 
-/* YN bars */
 .yn-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .yn-label { font-size: 12px; color: var(--muted); flex: 0 0 160px; line-height: 1.4; }
 .yn-track { flex: 1; height: 20px; border-radius: 4px; overflow: hidden; display: flex; }
@@ -198,7 +187,31 @@ main { padding: 32px 40px 60px; max-width: 1400px; margin: 0 auto; }
 .yn-no { background: var(--red); opacity: 0.7; transition: width 0.5s ease; }
 .yn-stat { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; min-width: 80px; text-align: right; }
 
-/* ── TABLE ── */
+/* ── LOCATION HEADCOUNT CARD ── */
+.loc-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.loc-table thead th {
+  font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted2); padding: 0 10px 10px;
+  text-align: right; border-bottom: 1px solid var(--border);
+}
+.loc-table thead th:first-child { text-align: left; }
+.loc-table tbody tr { border-bottom: 1px solid rgba(248,245,242,0.04); transition: background 0.12s; }
+.loc-table tbody tr:last-child { border-bottom: none; }
+.loc-table tbody tr:hover { background: var(--card2); }
+.loc-table tbody td { padding: 8px 10px; }
+.loc-name { color: var(--text); font-weight: 500; }
+.loc-num { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; }
+.loc-total { font-family: var(--mono); font-size: 12px; color: var(--gold); text-align: right; font-weight: 600; }
+.loc-bar-cell { width: 120px; padding-right: 14px; }
+.loc-bar-split { height: 6px; border-radius: 3px; overflow: hidden; display: flex; }
+.loc-bar-students { background: var(--cream); }
+.loc-bar-guests { background: var(--gold); opacity: 0.6; }
+.loc-totals-row td { padding: 10px 10px 4px; border-top: 1px solid var(--border2); }
+.loc-totals-row .loc-name { color: var(--gold); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+.loc-totals-row .loc-total { color: var(--cream); font-size: 13px; }
+.headcount-legend { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.hc-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
 .table-section { margin-bottom: 40px; }
 .table-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .table-title { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
@@ -238,7 +251,6 @@ tbody td:first-child { color: var(--text); font-weight: 500; }
 .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .pg-info { font-family: var(--mono); font-size: 11px; }
 
-/* ── FOOTER ── */
 footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .footer-left { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .footer-left strong { color: var(--gold); }
@@ -256,14 +268,12 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading-screen">
   <div class="loader-logo">Miva Convocation Travel HQ · 2026</div>
   <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
   <div class="loader-status" id="loader-status">Connecting to data source…</div>
 </div>
 
-<!-- ERROR -->
 <div id="error-screen">
   <div class="error-box">
     <h2>⚠ Could not load data</h2>
@@ -274,7 +284,6 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="app">
   <header>
     <div class="header-left">
@@ -289,7 +298,6 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
   </header>
 
   <main>
-    <!-- QUERY -->
     <div class="query-section">
       <div class="query-label">Query the data</div>
       <div class="query-pills">
@@ -315,7 +323,6 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
       <div id="q-result"></div>
     </div>
 
-    <!-- FILTERS -->
     <div class="filters-row">
       <div class="filter-group"><span class="filter-label">Category</span>
         <select class="filter-select" id="f-cat" onchange="applyFilters()">
@@ -358,10 +365,8 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
       <button class="reset-btn" onclick="resetFilters()">Reset</button>
     </div>
 
-    <!-- METRICS -->
     <div class="metrics-grid" id="metrics"></div>
 
-    <!-- CHARTS ROW 1 -->
     <div class="charts-grid">
       <div class="chart-card">
         <div class="chart-title">Attending ceremony</div>
@@ -398,9 +403,30 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
         <div class="chart-title">Respondents by location</div>
         <div class="bar-list" id="c-locations"></div>
       </div>
+
+      <!-- ── NEW: HEADCOUNT BY LOCATION ── -->
+      <div class="chart-card span3">
+        <div class="chart-title">Headcount by location — students + guests coming to Lagos</div>
+        <div class="headcount-legend">
+          <span><span class="hc-dot" style="background:var(--cream)"></span><span style="font-size:12px;color:var(--muted)">Students attending</span></span>
+          <span><span class="hc-dot" style="background:var(--gold);opacity:0.8"></span><span style="font-size:12px;color:var(--muted)">Estimated guests</span></span>
+          <span style="margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted2)">Bar = share of grand total headcount</span>
+        </div>
+        <table class="loc-table">
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th style="text-align:right">Students</th>
+              <th style="text-align:right">Est. guests</th>
+              <th style="text-align:right">Total</th>
+              <th style="text-align:left;padding-left:10px;width:140px">Breakdown</th>
+            </tr>
+          </thead>
+          <tbody id="c-headcount-body"></tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- TABLE -->
     <div class="table-section">
       <div class="table-header">
         <span class="table-title">All respondents</span>
@@ -443,34 +469,19 @@ footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex;
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════
-// CONFIG — paste your Google Sheet ID below (see footer for instructions)
-// ════════════════════════════════════════════════════════
-const SHEET_ID  = '1izPE2jcI0SMWVQXgwrVNVd7dkpjub4Pqklx3DAHGO0E'; // ← your Sheet ID
-const GID       = '1918259326';  // your specific sheet tab
-
+const SHEET_ID  = '1izPE2jcI0SMWVQXgwrVNVd7dkpjub4Pqklx3DAHGO0E';
+const GID       = '1918259326';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+const CSV_URL   = 'https://script.google.com/macros/s/AKfycbzmTBfenD_WOOY9VEHb-ef1uHgZs8c4TGUV7XuMeQDXenZFVhoGO-aAtCJZu-wUxWHuzg/exec';
 
-// ── APPS SCRIPT WEB APP URL ──────────────────────────────────────────────────
-// Paste your deployed Apps Script URL here after following the setup steps
-const CSV_URL = 'https://script.google.com/macros/s/AKfycbzmTBfenD_WOOY9VEHb-ef1uHgZs8c4TGUV7XuMeQDXenZFVhoGO-aAtCJZu-wUxWHuzg/exec';
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ════════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════════
 let allData = [], filtered = [], tableRows = [];
 let sortKey = 'name', sortDir = 1, currentPage = 1;
 const PAGE_SIZE = 20;
 
-// ════════════════════════════════════════════════════════
-// FETCH & PARSE
-// ════════════════════════════════════════════════════════
 async function fetchAndRender() {
   setLoader(10, 'Fetching live data from Google Sheets…');
   document.getElementById('gh-link').href = SHEET_URL;
   document.getElementById('error-url').textContent = CSV_URL;
-
   try {
     const res = await fetch(CSV_URL + '?t=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -505,7 +516,6 @@ function parseCSV(text) {
   const tabs = (first.match(/\t/g)||[]).length;
   const commas = (first.match(/,/g)||[]).length;
   const delim = tabs >= commas ? '\t' : ',';
-
   function parseRow(line) {
     if (delim==='\t') return line.split('\t').map(c=>c.trim());
     const r=[]; let cur='',inQ=false;
@@ -516,7 +526,6 @@ function parseCSV(text) {
     }
     r.push(cur.trim()); return r;
   }
-
   return lines.slice(1).map((line,idx) => {
     const r = parseRow(line);
     return {
@@ -597,16 +606,12 @@ function normDate(d) {
   return d;
 }
 
-// ════════════════════════════════════════════════════════
-// FILTERS
-// ════════════════════════════════════════════════════════
 function applyFilters() {
   const cat = document.getElementById('f-cat').value;
   const att = document.getElementById('f-att').value;
   const gst = document.getElementById('f-gst').value;
   const acc = document.getElementById('f-acc').value;
   const td  = document.getElementById('f-td').value;
-
   filtered = allData.filter(r => {
     if(cat && !r.category.includes(cat)) return false;
     if(att && r.attending !== att) return false;
@@ -615,7 +620,6 @@ function applyFilters() {
     if(td  && !r.travel_date.includes(td)) return false;
     return true;
   });
-
   document.getElementById('filter-count').textContent = filtered.length + ' of ' + allData.length + ' shown';
   renderMetrics();
   renderCharts();
@@ -629,9 +633,6 @@ function resetFilters() {
   applyFilters();
 }
 
-// ════════════════════════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════════════════════════
 const cnt = (fn) => filtered.filter(fn).length;
 const pct = (v,n) => n ? Math.round(v/n*100) : 0;
 
@@ -641,16 +642,12 @@ function freqMap(field, data) {
   return m;
 }
 
-// ════════════════════════════════════════════════════════
-// METRICS
-// ════════════════════════════════════════════════════════
 function renderMetrics() {
   const n = filtered.length;
   const att = cnt(r=>r.attending==='Yes');
   const guests = cnt(r=>r.with_guests==='Yes');
   const flight = cnt(r=>r.flight==='Yes');
   const notAtt = n - att;
-
   document.getElementById('metrics').innerHTML = `
     <div class="metric b"><div class="metric-label">Total responses</div><div class="metric-value">${n}</div></div>
     <div class="metric g"><div class="metric-label">Attending</div><div class="metric-value">${att}</div><div class="metric-sub">${pct(att,n)}% of respondents</div></div>
@@ -660,9 +657,6 @@ function renderMetrics() {
   `;
 }
 
-// ════════════════════════════════════════════════════════
-// CHARTS
-// ════════════════════════════════════════════════════════
 function donut(elId, segs, centerVal, centerLbl) {
   const total = segs.reduce((s,x)=>s+x.v,0)||1;
   let deg=0;
@@ -691,22 +685,29 @@ function bars(elId, items, color) {
     </div>`).join('');
 }
 
+function parseGuests(r) {
+  if (r.with_guests !== 'Yes') return 0;
+  const raw = (r.guest_count || '').toLowerCase().trim();
+  const num = parseInt(raw);
+  if (!isNaN(num) && num > 0) return num;
+  const words = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10 };
+  for (const [word, val] of Object.entries(words)) if (raw.includes(word)) return val;
+  // Said yes to guests but no count given — assume 1
+  return 1;
+}
+
 function renderCharts() {
   const d = filtered, n = d.length;
 
-  // Attending
   const aY=cnt(r=>r.attending==='Yes'), aN=n-aY;
   donut('c-attending',[{l:'Yes',v:aY,c:'var(--gold)'},{l:'No',v:aN,c:'var(--red)'}],aY,'Attending');
 
-  // Category
   const ug=cnt(r=>r.category.includes('Undergraduate')), pg=cnt(r=>r.category.includes('Postgraduate'));
   donut('c-category',[{l:'Undergraduate',v:ug,c:'var(--cream)'},{l:'Postgraduate',v:pg,c:'var(--red)'}],n,'Total');
 
-  // Accom type
   const si=cnt(r=>r.accom_type.includes('Single')), sh=cnt(r=>r.accom_type.includes('Shared')), no=n-si-sh;
   donut('c-accom',[{l:'Single',v:si,c:'var(--cream)'},{l:'Shared',v:sh,c:'var(--gold)'},{l:'None',v:no,c:'var(--card2)'}],si+sh,'Specified');
 
-  // Services
   const svcs=[
     {l:'Flight arrangements', y:cnt(r=>r.flight==='Yes'), n:cnt(r=>r.flight==='No')},
     {l:'Airport pickup',      y:cnt(r=>r.pickup==='Yes'), n:cnt(r=>r.pickup==='No')},
@@ -724,29 +725,68 @@ function renderCharts() {
     </div>`;
   }).join('');
 
-  // Nights
   const nm=freqMap('nights');
   bars('c-nights',['1 night','2 nights','3 nights','More than 3 nights'].map(k=>({l:k,v:nm[k]||0})),'var(--cream)');
 
-  // Travel dates
   const tm=freqMap('travel_date');
   const tSorted=Object.entries(tm).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([l,v])=>({l,v}));
   bars('c-travel', tSorted.length?tSorted:[{l:'No data',v:0}], 'var(--gold)');
 
-  // Return dates
   const rm=freqMap('return_date');
   const rSorted=Object.entries(rm).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([l,v])=>({l,v}));
   bars('c-return', rSorted.length?rSorted:[{l:'No data',v:0}], 'var(--red)');
 
-  // Locations
   const lm=freqMap('location');
   const locItems=Object.entries(lm).sort((a,b)=>b[1]-a[1]).slice(0,14).map(([l,v])=>({l,v}));
   bars('c-locations', locItems, 'var(--gold)');
+
+  // ── HEADCOUNT BY LOCATION ──
+  const att = d.filter(r => r.attending === 'Yes');
+  const locMap = {};
+  att.forEach(r => {
+    const loc = r.location || 'Unknown';
+    if (!locMap[loc]) locMap[loc] = { students: 0, guests: 0 };
+    locMap[loc].students++;
+    locMap[loc].guests += parseGuests(r);
+  });
+
+  const hcRows = Object.entries(locMap)
+    .map(([loc, v]) => ({ loc, students: v.students, guests: v.guests, total: v.students + v.guests }))
+    .sort((a, b) => b.total - a.total);
+
+  const grandStudents = hcRows.reduce((s, r) => s + r.students, 0);
+  const grandGuests   = hcRows.reduce((s, r) => s + r.guests, 0);
+  const grandTotal    = grandStudents + grandGuests;
+  const maxTotal      = hcRows[0]?.total || 1;
+
+  const bodyEl = document.getElementById('c-headcount-body');
+  if (bodyEl) {
+    bodyEl.innerHTML = hcRows.map(r => {
+      const stuPct = Math.round(r.students / maxTotal * 100);
+      const gstPct = Math.round(r.guests   / maxTotal * 100);
+      return `<tr>
+        <td class="loc-name">${r.loc}</td>
+        <td class="loc-num">${r.students}</td>
+        <td class="loc-num">${r.guests}</td>
+        <td class="loc-total">${r.total}</td>
+        <td style="padding-right:14px;width:140px">
+          <div class="loc-bar-split">
+            <div class="loc-bar-students" style="width:${stuPct}%"></div>
+            <div class="loc-bar-guests"   style="width:${gstPct}%"></div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') + `
+    <tr class="loc-totals-row">
+      <td class="loc-name">Grand total</td>
+      <td class="loc-num" style="color:var(--cream);font-weight:600">${grandStudents}</td>
+      <td class="loc-num" style="color:var(--cream);font-weight:600">${grandGuests}</td>
+      <td class="loc-total" style="font-size:14px;color:var(--cream)">${grandTotal}</td>
+      <td></td>
+    </tr>`;
+  }
 }
 
-// ════════════════════════════════════════════════════════
-// TABLE
-// ════════════════════════════════════════════════════════
 function renderTable() {
   const q = (document.getElementById('tbl-search')?.value||'').toLowerCase();
   let rows = tableRows.filter(r =>
@@ -758,11 +798,9 @@ function renderTable() {
   const total=rows.length, pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   currentPage=Math.min(currentPage,pages);
   const start=(currentPage-1)*PAGE_SIZE, slice=rows.slice(start,start+PAGE_SIZE);
-
   document.getElementById('pg-info').textContent = `Page ${currentPage} of ${pages} · ${total} records`;
   document.getElementById('pg-prev').disabled = currentPage<=1;
   document.getElementById('pg-next').disabled = currentPage>=pages;
-
   document.getElementById('tbl-body').innerHTML = slice.map((r,i)=>`
     <tr>
       <td>${start+i+1}. ${r.name}</td>
@@ -785,23 +823,17 @@ function searchTable(){ currentPage=1; renderTable(); }
 function sortBy(k){ sortKey===k?sortDir*=-1:(sortKey=k,sortDir=1); renderTable(); }
 function changePage(d){ currentPage+=d; renderTable(); }
 
-// ════════════════════════════════════════════════════════
-// QUERY ENGINE
-// ════════════════════════════════════════════════════════
 function runQ(q) {
   document.getElementById('q-input').value = q;
   const ql = q.toLowerCase().trim();
   const el = document.getElementById('q-result');
   const d = filtered, n = d.length;
   if(!n){ el.textContent='No data matches current filters.'; el.style.display='block'; return; }
-
   const c=(fn)=>d.filter(fn).length;
   const p=(v)=>n?Math.round(v/n*100):0;
   const fm=(field)=>{ const m={}; d.forEach(r=>{const v=r[field];if(v)m[v]=(m[v]||0)+1;}); return m; };
   const rank=(m,lim=12)=>Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,lim).map(([k,v])=>`  • ${k}: ${v} (${p(v)}%)`).join('\n');
-
   let out='';
-
   if(/summar/.test(ql)) {
     const aY=c(r=>r.attending==='Yes'),ug=c(r=>r.category.includes('Under')),pg=c(r=>r.category.includes('Post'));
     const fY=c(r=>r.flight==='Yes'),pY=c(r=>r.pickup==='Yes'),aI=c(r=>r.accom_int==='Yes'),gY=c(r=>r.with_guests==='Yes');
@@ -847,7 +879,6 @@ function runQ(q) {
     const m=fm('return_date');
     out=`Return dates from Lagos:\n`+Object.entries(m).sort().map(([k,v])=>`  • ${k}: ${v} (${p(v)}%)`).join('\n');
   } else {
-    // City lookup
     const cityMatch = ql.match(/from\s+([a-z\s]+?)(?:\?|$)/)||ql.match(/how many.*?([a-z]{3,})(?:\?|$)/);
     if(cityMatch) {
       const city=cityMatch[1].trim();
@@ -861,14 +892,10 @@ function runQ(q) {
       out=`No specific match for "${q}".\n\nTry: summary · top locations · flight interest · nights breakdown · from [city]`;
     }
   }
-
   el.textContent=out;
   el.style.display='block';
 }
 
-// ════════════════════════════════════════════════════════
-// BOOT
-// ════════════════════════════════════════════════════════
 fetchAndRender();
 </script>
 </body>
